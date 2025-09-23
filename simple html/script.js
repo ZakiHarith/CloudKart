@@ -762,7 +762,7 @@ function handleReloadDatabase() {
         db.clearAll();
         // Reload products
         loadProductsFromDatabase();
-        showNotification('Database reloaded successfully! Your MX5 image should now be visible.');
+        showNotification('Database have successfully reload');
         
         // Close the user profile tabs
         closeUserTabs();
