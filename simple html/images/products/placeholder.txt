@@ -1,0 +1,38 @@
+# Product Images Placeholder
+
+This file serves as a placeholder to show the directory structure.
+
+## To add your custom product images:
+
+1. Replace this file with your actual product images
+2. Use descriptive filenames like:
+   - headphones.jpg
+   - smartwatch.jpg
+   - tshirt.jpg
+   - jeans.jpg
+   - coffee-maker.jpg
+   - garden-tools.jpg
+   - yoga-mat.jpg
+   - running-shoes.jpg
+   - laptop-stand.jpg
+   - winter-jacket.jpg
+   - air-purifier.jpg
+   - basketball.jpg
+   - gift-card.jpg
+
+3. Update the product data in script.js to include the image paths
+
+## Example:
+If you have an image called "headphones.jpg", update the product data like this:
+
+```javascript
+{
+    id: 1,
+    title: "Wireless Bluetooth Headphones",
+    // ... other properties
+    image: "images/products/headphones.jpg",
+    // ... rest of properties
+}
+```
+
+The system will automatically use your custom image, and if it fails to load, it will fall back to the FontAwesome icon.
