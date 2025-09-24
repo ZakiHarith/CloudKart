@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudKart - Your Cloud Shopping Destination</title>
+    
+    <!-- Preload critical resources for better performance -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AWS Configuration -->
+    <script>
+        // CloudKart AWS Configuration
+        window.AWS_CONFIG = {
+            S3_BUCKET: 'cloudkart-website',
+            CLOUDFRONT_URL: window.location.origin,
+            isProduction: () => {
+                return window.location.hostname !== 'localhost' && 
+                       window.location.hostname !== '127.0.0.1' &&
+                       !window.location.hostname.includes('localhost');
+            },
+            getImageUrl: (imagePath) => {
+                return window.AWS_CONFIG.isProduction() ? 
+                    `${window.AWS_CONFIG.CLOUDFRONT_URL}/${imagePath}` : 
+                    imagePath;
+            }
+        };
+    </script>
+    
+    <!-- Meta tags for SEO and social sharing -->
+    <meta name="description" content="CloudKart - Your trusted cloud shopping destination. Discover amazing products with fast delivery and great prices.">
+    <meta name="keywords" content="shopping, e-commerce, cloud, products, electronics, fashion, home, sports">
+    <meta name="author" content="CloudKart">
+    
+    <!-- Open Graph tags for social media -->
+    <meta property="og:title" content="CloudKart - Your Cloud Shopping Destination">
+    <meta property="og:description" content="Discover amazing products in the cloud with CloudKart">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cloudkart.com">
+    
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CloudKart - Your Cloud Shopping Destination">
+    <meta name="twitter:description" content="Discover amazing products in the cloud with CloudKart">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- Performance optimizations -->
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-cloud"></i>
+                    <span>CloudKart</span>
+                </div>
+                <div class="nav-search">
+                    <input type="text" placeholder="Search products..." id="searchInput">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-btn" id="wishlistBtn">
+                        <i class="fas fa-heart"></i>
+                        <span class="badge" id="wishlistCount">0</span>
+                    </button>
+                    <button class="nav-btn" id="cartBtn">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge" id="cartCount">0</span>
+                    </button>
+                    <button class="nav-btn" id="userBtn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="nav-btn" id="reloadBtn" title="Reload Database" style="display: none;">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to CloudKart</h1>
+            <p>Discover amazing products in the cloud</p>
+            <button class="cta-btn">Shop Now</button>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-shopping-bag"></i>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <div class="container">
+            <h2>Shop by Category</h2>
+            <div class="category-grid">
+                <div class="category-card" data-category="electronics">
+                    <i class="fas fa-laptop"></i>
+                    <h3>Electronics</h3>
+                </div>
+                <div class="category-card" data-category="fashion">
+                    <i class="fas fa-tshirt"></i>
+                    <h3>Fashion</h3>
+                </div>
+                <div class="category-card" data-category="home">
+                    <i class="fas fa-home"></i>
+                    <h3>Home & Garden</h3>
+                </div>
+                <div class="category-card" data-category="sports">
+                    <i class="fas fa-dumbbell"></i>
+                    <h3>Sports</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="electronics">Electronics</button>
+                    <button class="filter-btn" data-filter="fashion">Fashion</button>
+                    <button class="filter-btn" data-filter="home">Home</button>
+                    <button class="filter-btn" data-filter="sports">Sports</button>
+                </div>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="close-cart" id="closeCart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically loaded here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total: $<span id="cartTotal">0.00</span></span>
+            </div>
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Wishlist Tab Menu -->
+    <div class="wishlist-tabs" id="wishlistTabs">
+        <div class="wishlist-header">
+            <div class="wishlist-title">
+                <i class="fas fa-heart"></i>
+                <h3>My Wishlist</h3>
+                <span class="wishlist-count" id="wishlistTabCount">0 items</span>
+            </div>
+            <button class="close-wishlist" id="closeWishlist">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="wishlist-content">
+            <div class="wishlist-items-container" id="wishlistItemsContainer">
+                <!-- Wishlist items will be dynamically loaded here -->
+            </div>
+            
+            <div class="wishlist-actions">
+                <button class="btn btn-primary" id="addAllToCartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    Add All to Cart
+                </button>
+                <button class="btn btn-secondary" id="clearWishlistBtn">
+                    <i class="fas fa-trash"></i>
+                    Clear Wishlist
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Overlay -->
+    <div class="wishlist-overlay" id="wishlistOverlay"></div>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <button class="close-auth" id="closeAuth">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="auth-content">
+                <!-- Login Form -->
+                <div class="auth-form" id="loginForm">
+                    <div class="auth-logo">
+                        <i class="fas fa-cloud"></i>
+                        <h2>Welcome Back</h2>
+                        <p>Sign in to your CloudKart account</p>
+                    </div>
+                    
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" name="email" required>
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="password" required>
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="rememberMe">
+                                <span class="checkmark"></span>
+                                Remember me
+                            </label>
+                            <a href="#" class="forgot-password">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn">Sign In</button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button class="social-btn google-btn">
+                            <i class="fab fa-google"></i>
+                            Continue with Google
+                        </button>
+                        <button class="social-btn facebook-btn">
+                            <i class="fab fa-facebook-f"></i>
+                            Continue with Facebook
+                        </button>
+                    </div>
+                    
+                    <div class="auth-switch">
+                        <p>Don't have an account? <a href="#" id="showRegister">Sign up</a></p>
+                    </div>
+                </div>
+                
+                <!-- Registration Form -->
+                <div class="auth-form" id="registerForm" style="display: none;">
+                    <div class="auth-logo">
+                        <i class="fas fa-cloud"></i>
+                        <h2>Create Account</h2>
+                        <p>Join CloudKart today</p>
+                    </div>
+                    
+                    <form id="registerFormElement">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerEmail">Email Address</label>
+                            <input type="email" id="registerEmail" name="email" required>
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" name="password" required>
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn">Create Account</button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button class="social-btn google-btn">
+                            <i class="fab fa-google"></i>
+                            Continue with Google
+                        </button>
+                        <button class="social-btn facebook-btn">
+                            <i class="fab fa-facebook-f"></i>
+                            Continue with Facebook
+                        </button>
+                    </div>
+                    
+                    <div class="auth-switch">
+                        <p>Already have an account? <a href="#" id="showLogin">Sign in</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay"></div>
+
+    <!-- User Profile Tab Menu -->
+    <div class="user-profile-tabs" id="userProfileTabs">
+        <div class="tab-header">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">John Doe</span>
+                    <span class="user-email" id="userEmail">john@example.com</span>
+                </div>
+            </div>
+            <button class="close-tabs" id="closeTabs">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+            <button class="tab-btn" data-tab="orders">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Orders</span>
+            </button>
+            <button class="tab-btn" data-tab="wishlist">
+                <i class="fas fa-heart"></i>
+                <span>Wishlist</span>
+            </button>
+            <button class="tab-btn" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Profile Tab -->
+            <div class="tab-panel active" id="profile-tab">
+                <div class="tab-panel-header">
+                    <h3>My Profile</h3>
+                    <p>Manage your personal information</p>
+                </div>
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="profileFirstName" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="profileLastName" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="profileEmail" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="profilePhone" placeholder="Enter your phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="profileDob">
+                    </div>
+                    <button class="save-btn">Save Changes</button>
+                </div>
+            </div>
+            
+            <!-- Orders Tab -->
+            <div class="tab-panel" id="orders-tab">
+                <div class="tab-panel-header">
+                    <h3>My Orders</h3>
+                    <p>Track and manage your orders</p>
+                </div>
+                <div class="orders-list">
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h4>No orders yet</h4>
+                        <p>Start shopping to see your orders here</p>
+                        <button class="shop-btn">Start Shopping</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wishlist Tab -->
+            <div class="tab-panel" id="wishlist-tab">
+                <div class="tab-panel-header">
+                    <h3>My Wishlist</h3>
+                    <p>Items you've saved for later</p>
+                </div>
+                <div class="wishlist-items" id="wishlistItems">
+                    <!-- Wishlist items will be dynamically loaded here -->
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div class="tab-panel" id="settings-tab">
+                <div class="tab-panel-header">
+                    <h3>Account Settings</h3>
+                    <p>Manage your account preferences</p>
+                </div>
+                <div class="settings-sections">
+                    <div class="settings-section">
+                        <h4>Notifications</h4>
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="checkmark"></span>
+                                Email notifications
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="orderUpdates" checked>
+                                <span class="checkmark"></span>
+                                Order updates
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="promotionalEmails">
+                                <span class="checkmark"></span>
+                                Promotional emails
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Privacy</h4>
+                        <div class="setting-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="profileVisibility" checked>
+                                <span class="checkmark"></span>
+                                Make profile visible to other users
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Developer Tools</h4>
+                        <button class="btn" id="reloadDatabaseBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Reload Database
+                        </button>
+                        <p style="font-size: 0.8rem; color: #718096; margin-top: 0.5rem;">
+                            Use this to refresh product data and images
+                        </p>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Account Actions</h4>
+                        <button class="danger-btn" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CloudKart</h3>
+                    <p>Your trusted cloud shopping destination</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe for updates</p>
+                    <div class="newsletter">
+                        <input type="email" placeholder="Enter your email">
+                        <button>Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CloudKart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="database/database.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- Performance monitoring -->
+    <script>
+        // Basic performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            console.log('Page load time:', loadTime + 'ms');
+            
+            // Send performance data to analytics (if implemented)
+            if (window.gtag) {
+                gtag('event', 'page_load_time', {
+                    'custom_parameter': loadTime
+                });
+            }
+        });
+    </script>
+</body>
+</html>
