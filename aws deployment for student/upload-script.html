@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudKart File Upload Helper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .step {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+        
+        .step h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .step p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .file-list {
+            background: white;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-name {
+            font-family: monospace;
+            color: #2d3748;
+        }
+        
+        .file-size {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: #edf2f7;
+            border-color: #5a67d8;
+        }
+        
+        .upload-area.dragover {
+            background: #e6fffa;
+            border-color: #38b2ac;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-subtext {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+        
+        .status.info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #90cdf4;
+        }
+        
+        .instructions {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .instructions h4 {
+            color: #742a2a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions ul {
+            color: #742a2a;
+            margin-left: 1.5rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .step {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CloudKart Upload Helper</h1>
+            <p>Easy file upload for AWS S3 deployment</p>
+        </div>
+        
+        <div class="content">
+            <div class="step">
+                <h3>📋 Step 1: Prepare Your Files</h3>
+                <p>Make sure you have all the files from your <code>simple html</code> folder ready:</p>
+                <div class="file-list">
+                    <div class="file-item">
+                        <span class="file-name">index.html</span>
+                        <span class="file-size">Main page</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-name">script.js</span>
+                        <span class="file-size">JavaScript functionality</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-name">styles.css</span>
+                        <span class="file-size">Styling</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-name">database/database.js</span>
+                        <span class="file-size">Database logic</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-name">images/products/*.jpeg</span>
+                        <span class="file-size">Product images</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>📁 Step 2: Upload Files</h3>
+                <p>Drag and drop your files or click to select them:</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop files here or click to select</div>
+                    <div class="upload-subtext">Select all files from your simple html folder</div>
+                </div>
+                
+                <input type="file" id="fileInput" multiple style="display: none;">
+                
+                <div class="progress hidden" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div id="statusContainer"></div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn" id="uploadBtn" disabled>Upload to S3</button>
+                    <button class="btn" id="clearBtn">Clear Files</button>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>⚠️ Important Instructions</h3>
+                <div class="instructions">
+                    <h4>Before uploading to AWS S3:</h4>
+                    <ul>
+                        <li>Make sure your S3 bucket is created and configured for static website hosting</li>
+                        <li>Verify that public access is enabled for your bucket</li>
+                        <li>Ensure the bucket policy allows public read access</li>
+                        <li>Have your AWS S3 bucket name ready</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>🔗 Step 3: AWS S3 Upload</h3>
+                <p>This tool helps you prepare files for upload. To actually upload to AWS S3:</p>
+                <ol style="margin-left: 1.5rem; color: #4a5568; line-height: 1.8;">
+                    <li>Go to your AWS S3 console</li>
+                    <li>Select your bucket</li>
+                    <li>Click "Upload"</li>
+                    <li>Drag and drop the files you selected here</li>
+                    <li>Click "Upload" to complete the process</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusContainer = document.getElementById('statusContainer');
+        
+        let selectedFiles = [];
+        
+        // File selection handlers
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Button handlers
+        uploadBtn.addEventListener('click', handleUpload);
+        clearBtn.addEventListener('click', clearFiles);
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+        
+        function processFiles(files) {
+            selectedFiles = files;
+            displayFiles();
+            updateUploadButton();
+            showStatus('Files selected successfully!', 'success');
+        }
+        
+        function displayFiles() {
+            const fileList = document.querySelector('.file-list');
+            fileList.innerHTML = '';
+            
+            selectedFiles.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function updateUploadButton() {
+            uploadBtn.disabled = selectedFiles.length === 0;
+        }
+        
+        function handleUpload() {
+            if (selectedFiles.length === 0) return;
+            
+            showStatus('Preparing files for upload...', 'info');
+            progressContainer.classList.remove('hidden');
+            
+            // Simulate upload process
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showStatus(`✅ ${selectedFiles.length} files ready for AWS S3 upload!`, 'success');
+                    showUploadInstructions();
+                }
+            }, 200);
+        }
+        
+        function showUploadInstructions() {
+            const instructions = document.createElement('div');
+            instructions.className = 'status info';
+            instructions.innerHTML = `
+                <h4>📋 Next Steps:</h4>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Go to your AWS S3 console</li>
+                    <li>Select your bucket</li>
+                    <li>Click "Upload"</li>
+                    <li>Drag these files to the upload area</li>
+                    <li>Click "Upload" to deploy your website</li>
+                </ol>
+            `;
+            statusContainer.appendChild(instructions);
+        }
+        
+        function clearFiles() {
+            selectedFiles = [];
+            fileInput.value = '';
+            displayFiles();
+            updateUploadButton();
+            progressContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            statusContainer.innerHTML = '';
+            showStatus('Files cleared. Select new files to upload.', 'info');
+        }
+        
+        function showStatus(message, type) {
+            const status = document.createElement('div');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            statusContainer.innerHTML = '';
+            statusContainer.appendChild(status);
+        }
+        
+        // Initialize
+        showStatus('Select files from your simple html folder to get started.', 'info');
+    </script>
+</body>
+</html>
