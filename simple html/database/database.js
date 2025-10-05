@@ -387,7 +387,7 @@ class CloudKartDB {
                     badge: "Easter Egg",
                     inStock: true,
                     stock: 999,
-                    rating: 5.0,
+                    rating: 10.0,
                     reviews: 1
                 },
                 {
@@ -395,7 +395,7 @@ class CloudKartDB {
                     description: "Recommended by Fared",
                     price: 99.99,
                     originalPrice: 129.99,
-                    category: "Fashion",
+                    category: "sports",
                     icon: "fas fa-shoe-prints",
                     image: "images/products/toe.jpeg",
                     badge: "Easter Egg",

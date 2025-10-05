@@ -213,10 +213,10 @@ function createProductCard(product) {
                     `<span class="original-price">$${product.originalPrice}</span>` : ''}
             </div>
             <div class="product-actions">
-                <button class="btn btn-primary" onclick="addToCart('${product.id}')" data-product-id="${product.id}">
+                <button class="btn btn-primary" data-product-id="${product.id}">
                     <i class="fas fa-shopping-cart"></i> Add to Cart
                 </button>
-                <button class="btn btn-secondary" onclick="addToWishlist('${product.id}')" data-product-id="${product.id}">
+                <button class="btn btn-secondary" data-product-id="${product.id}">
                     <i class="fas fa-heart"></i>
                 </button>
             </div>
